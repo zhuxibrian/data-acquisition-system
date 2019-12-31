@@ -5,6 +5,12 @@
     <ClCompile Include="MainWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SqlServerRepository.cpp">
+      <Filter>Source Files\repository</Filter>
+    </ClCompile>
+    <ClCompile Include="Config.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resource Files">
@@ -27,10 +33,28 @@
       <Extensions>ui</Extensions>
       <ParseFiles>true</ParseFiles>
     </Filter>
+    <Filter Include="Header Files\repository">
+      <UniqueIdentifier>{7b8d3540-c2a9-4070-804b-fb04dce10b01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\repository">
+      <UniqueIdentifier>{34c6ec18-929d-459d-8101-a00bf97e2f76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="config">
+      <UniqueIdentifier>{8e04a69b-111a-44c5-a7d2-d9215f67c5b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\utils">
+      <UniqueIdentifier>{52b04c07-d2c9-48cf-8c26-fe3d9f6f1d72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\utils">
+      <UniqueIdentifier>{ec4a5cac-5286-44eb-ba3e-953d1050fdc6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="MainWindow.h">
       <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="SqlServerRepository.h">
+      <Filter>Header Files\repository</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
@@ -45,5 +69,16 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="data-acquisition-system.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.md" />
+    <None Include="config.yaml">
+      <Filter>config</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Config.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

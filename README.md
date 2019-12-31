@@ -16,6 +16,11 @@
 * 设置485通道周期采样开关及采样周期
 本程序通过yaml文件的方式进行数据采集的配置，配置文件设计如下：
 ```
+database:
+  host: localhost
+  databaseName: aidata
+  username: user
+  password: 123456
 devices:
   -
     description: 'DemoDevice,BID#0'                 #设备描述符
