@@ -16,14 +16,8 @@
 * 设置485通道周期采样开关及采样周期
 本程序通过yaml文件的方式进行数据采集的配置，配置文件设计如下：
 ```
-database:
-  host: localhost
-  databaseName: aidata
-  username: user
-  password: 123456
 devices:
-  -
-    description: 'DemoDevice,BID#0'                 #设备描述符
+  - description: 'DemoDevice,BID#0'                 #设备描述符
     profilePath: '../../profile/DemoDevice.xml'     #设备预配置文件路径
     startChannel: 0                                 #起始通道
     channelCount: 2                                 #通道数量
@@ -31,11 +25,8 @@ devices:
     sectionLength: 1024                             #通道采样缓存，即每次采样个数
     groupStartChannel: 0                            #每个动作周期起始触发通道
     groupStopChannel: 0                             #每个动作周期终止触发通道
-    thresholds:                                     #每个通道阈值，个数与channelCount相同
-      - 0.1
-      - 0.1
-  - 
-    description: 'DemoDevice,BID#1'
+    thresholds: [0.1, 0.1]                          #每个通道阈值，个数与channelCount相同
+  - description: 'DemoDevice,BID#1'
     profilePath: '../../profile/DemoDevice.xml'
     startChannel: 0
     channelCount: 2
@@ -43,14 +34,10 @@ devices:
     sectionLength: 1024
     groupStartChannel: 0
     groupStopChannel: 0
-    thresholds:
-      - 0.1
-      - 0.1
+    thresholds: [0.1, 0.1]
 serialPort:
-  -
-    portName: "com1"                                  #485端口名称
+  - portName: com1                                    #485端口名称
     period: 30s                                       #采样周期
-  -
-    portName: "com2"
+  - portName: com2
     period: 1m
 ```

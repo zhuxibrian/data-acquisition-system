@@ -59,7 +59,8 @@ int main(int argc, char *argv[])
 
 	LOG(INFO) << "data acquisition system start.";
 
-	Config cfg;
+	Config* config = new Config("./config/config.yaml");
+	config->loadConfig();
 
 
 	MainWindow w;
