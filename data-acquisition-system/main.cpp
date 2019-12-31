@@ -7,6 +7,7 @@
 #define GOOGLE_GLOG_DLL_DECL
 #define GLOG_NO_ABBREVIATED_SEVERITIES
 #include "glog/logging.h"
+#include "Config.h"
 
 #ifdef _DEBUG
 #pragma comment(lib,"../lib/libglog_staticd.lib")
@@ -57,6 +58,10 @@ int main(int argc, char *argv[])
 	initLog();
 
 	LOG(INFO) << "data acquisition system start.";
+
+	Config cfg;
+
+
 	MainWindow w;
 	w.show();
 	return a.exec();

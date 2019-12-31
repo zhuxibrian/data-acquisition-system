@@ -112,7 +112,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />
-    <None Include="config.yaml" />
+    <None Include="config\config.yaml" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="SqlServerRepository.h" />

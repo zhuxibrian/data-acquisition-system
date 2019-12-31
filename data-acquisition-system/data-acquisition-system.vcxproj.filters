@@ -72,7 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />
-    <None Include="config.yaml">
+    <None Include="config\config.yaml">
       <Filter>config</Filter>
     </None>
   </ItemGroup>
