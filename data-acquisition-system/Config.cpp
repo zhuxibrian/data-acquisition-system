@@ -25,8 +25,9 @@ namespace YAML {
 			device.groupStartChannel = node["groupStartChannel"].as<int>();
 			device.groupStopChannel = node["groupStopChannel"].as<int>();
 
-			for (std::size_t i=0; i<node["thresholds"].size(); i++) {
-				device.thresholds.push_back(node["thresholds"][i].as<double>());
+			for (auto n : node["thresholds"])
+			{
+				device.thresholds.push_back(n.as<double>());
 			}
 
 			return true;
@@ -38,8 +39,8 @@ namespace YAML {
 	{
 		static bool decode(const Node& node, DeviceConfig& dc)
 		{
-			for (std::size_t i = 0; i<node.size(); i++) {
-				dc.devices.push_back(node[i].as<Device>());
+			for (auto n : node) {
+				dc.devices.push_back(n.as<Device>());
 			}
 			return true;
 		}
@@ -61,8 +62,8 @@ namespace YAML {
 	{
 		static bool decode(const Node& node, SerialPortConfig& sc)
 		{
-			for (std::size_t i = 0; i < node.size(); i++) {
-				sc.serialPorts.push_back(node[i].as<SerialPort>());
+			for (auto n : node) {
+				sc.serialPorts.push_back(n.as<SerialPort>());
 			}
 			return true;
 		}
