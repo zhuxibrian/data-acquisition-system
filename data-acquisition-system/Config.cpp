@@ -104,3 +104,13 @@ bool Config::loadConfig()
 
 	return true;
 }
+
+DeviceConfig* Config::getDeviceConfig()
+{
+	return _deviceConfig;
+}
+
+SerialPortConfig* Config::getSerialPortConfig()
+{
+	return _serialPortConfig;
+}
