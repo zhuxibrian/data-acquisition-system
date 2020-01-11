@@ -28,9 +28,9 @@ void initLog()
 		return;
 	}
 
-	QDir dir;
-	dir.setFilter(QDir::Files);
-	QFileInfoList fileList = dir.entryInfoList();
+	
+	logdir.setFilter(QDir::Files);
+	QFileInfoList fileList = logdir.entryInfoList();
 	int fileCount = fileList.count();
 	for (int i = 0; i < fileCount; i++)
 	{
@@ -38,7 +38,7 @@ void initLog()
 		QDateTime lastModify = fileInfo.lastModified();
 		if (lastModify.secsTo(current) > LOGOUTTIME)
 		{
-			dir.remove(fileInfo.absoluteFilePath());
+			logdir.remove(fileInfo.absoluteFilePath());
 		}
 	}
 
