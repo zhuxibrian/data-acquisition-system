@@ -32,6 +32,14 @@ struct SerialPortConfig
 	std::vector<SerialPort> serialPorts;
 };
 
+struct DatabaseConfig 
+{
+	std::string host;
+	std::string dbname;
+	std::string username;
+	std::string password;
+};
+
 
 class Config
 {
@@ -42,11 +50,13 @@ public:
 	bool loadConfig();
 	DeviceConfig* getDeviceConfig();
 	SerialPortConfig* getSerialPortConfig();
+	DatabaseConfig* getDatabaseConfig();
 
 
 private:
 	DeviceConfig* _deviceConfig;
 	SerialPortConfig* _serialPortConfig;
+	DatabaseConfig* _databaseConfig;
 	std::string _configPath;
 };
 

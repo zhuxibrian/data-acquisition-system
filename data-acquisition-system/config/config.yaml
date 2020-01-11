@@ -23,3 +23,8 @@ serialPort:
     period: 30s                                       
   - portName: com2
     period: 1m
+database:
+  host: localhost
+  dbname: CollectionDB
+  username: user
+  password: 123456

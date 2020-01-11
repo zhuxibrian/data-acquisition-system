@@ -25,7 +25,7 @@ namespace YAML {
 			device.groupStartChannel = node["groupStartChannel"].as<int>();
 			device.groupStopChannel = node["groupStopChannel"].as<int>();
 
-			for (auto n : node["thresholds"])
+			for (const auto& n : node["thresholds"])
 			{
 				device.thresholds.push_back(n.as<double>());
 			}
@@ -39,7 +39,7 @@ namespace YAML {
 	{
 		static bool decode(const Node& node, DeviceConfig& dc)
 		{
-			for (auto n : node) {
+			for (const auto& n : node) {
 				dc.devices.push_back(n.as<Device>());
 			}
 			return true;
@@ -62,9 +62,22 @@ namespace YAML {
 	{
 		static bool decode(const Node& node, SerialPortConfig& sc)
 		{
-			for (auto n : node) {
+			for (const auto& n : node) {
 				sc.serialPorts.push_back(n.as<SerialPort>());
 			}
+			return true;
+		}
+	};
+
+	template<>
+	struct convert<DatabaseConfig>
+	{
+		static bool decode(const Node& node, DatabaseConfig& dc)
+		{
+			dc.host = node["host"].as<std::string>();
+			dc.dbname = node["dbname"].as<std::string>();
+			dc.username = node["username"].as<std::string>();
+			dc.password = node["password"].as<std::string>();
 			return true;
 		}
 	};
@@ -73,6 +86,7 @@ namespace YAML {
 Config::Config(std::string configPath) :
 	_deviceConfig(nullptr),
 	_serialPortConfig(nullptr),
+	_databaseConfig(nullptr),
 	_configPath(configPath)
 {
 
@@ -87,6 +101,9 @@ Config::~Config()
 	if (_serialPortConfig) {
 		delete _serialPortConfig;
 	}
+	if (_databaseConfig) {
+		delete _databaseConfig;
+	}
 }
 
 bool Config::loadConfig()
@@ -96,6 +113,9 @@ bool Config::loadConfig()
 	*_deviceConfig = node["devices"].as<DeviceConfig>();
 	_serialPortConfig = new SerialPortConfig;
 	*_serialPortConfig = node["serialPort"].as<SerialPortConfig>();
+	_databaseConfig = new DatabaseConfig;
+	*_databaseConfig = node["database"].as<DatabaseConfig>();
+
 
 	LOG(INFO) << "load config success. Card count is "
 		<< _deviceConfig->devices.size()
@@ -113,4 +133,9 @@ DeviceConfig* Config::getDeviceConfig()
 SerialPortConfig* Config::getSerialPortConfig()
 {
 	return _serialPortConfig;
+}
+
+DatabaseConfig* Config::getDatabaseConfig()
+{
+	return _databaseConfig;
 }
