@@ -71,15 +71,6 @@ int main(int argc, char *argv[])
 	}
 	LOG(INFO) << "database connect success.";
 
-// 	AnalogInput ai;
-// 	ai.groupID = "123";
-// 	ai.channel = 1;
-// 	ai.datetime = "2014-12-03 17:23:19.2880929";
-// 	ai.frequency = 1000;
-// 	ai.sampleCount = 100;
-// 	ai.data.push_back(1.1);
-// 	ssr.addAnalogInput(ai);
-
 	MainWindow w;
 	w.show();
 	return a.exec();

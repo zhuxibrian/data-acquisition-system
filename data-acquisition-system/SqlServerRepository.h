@@ -4,9 +4,7 @@
 #include <QtSql/QSqlDatabase>
 #include <vector>
 
-#define SQL_ADDANALOG_INPUT ("insert into \
-Analog_Input(groupId, channel, startTime, frequency, sampleCount, sampleData, isUse) \
-value(:groupId, :channel, :startTime, :frequency, :sampleCount, :sampleData, :isUse)")
+
 
 struct AnalogInput
 {
@@ -16,6 +14,13 @@ struct AnalogInput
 	int frequency;
 	int sampleCount;
 	std::vector<double> data;
+};
+
+struct SerialPortData
+{
+	int serialPort;
+	std::string time;
+	std::string data;
 };
 
 class SqlServerRepository : public QObject
@@ -30,6 +35,9 @@ public:
 		std::string username, std::string password);
 
 	bool addAnalogInput(AnalogInput& ai);
+	bool addAnalogInputErr(AnalogInput& ai);
+	bool addSerialPortData(SerialPortData& spd);
+
 
 
 private:
