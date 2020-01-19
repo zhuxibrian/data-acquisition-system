@@ -34,8 +34,7 @@
 	VALUES\
 	(:serialPort, :time,  :data, :isUse)")
 
-SqlServerRepository::SqlServerRepository(QObject *parent)
-	: QObject(parent)
+SqlServerRepository::SqlServerRepository()
 {
 }
 
@@ -138,7 +137,7 @@ bool SqlServerRepository::addSerialPortData(SerialPortData& spd)
 	QSqlQuery query;
 	query.prepare(SQL_ADD_SERIAL_PORT_DATA);
 
-	int serialPort = spd.serialPort;
+	QString serialPort = QString::fromStdString(spd.serialPort);
 	QString time = QString::fromStdString(spd.time);
 	QString data = QString::fromStdString(spd.data);
 

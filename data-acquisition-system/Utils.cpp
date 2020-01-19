@@ -22,3 +22,15 @@ std::string Utils::GuidToString(const GUID &guid)
 		guid.Data4[6], guid.Data4[7]);
 	return std::string(buf);
 }
+
+void Utils::StringToWstring(std::wstring& szDst, std::string str)
+{
+	std::string temp = str;
+	int len = MultiByteToWideChar(CP_ACP, 0, (LPCSTR)temp.c_str(), -1, NULL, 0);
+	wchar_t * wszUtf8 = new wchar_t[len + 1];
+	memset(wszUtf8, 0, len * 2 + 2);
+	MultiByteToWideChar(CP_ACP, 0, (LPCSTR)temp.c_str(), -1, (LPWSTR)wszUtf8, len);
+	szDst = wszUtf8;
+	std::wstring r = wszUtf8;
+	delete[] wszUtf8;
+}

@@ -18,7 +18,7 @@ struct AnalogInput
 
 struct SerialPortData
 {
-	int serialPort;
+	std::string serialPort;
 	std::string time;
 	std::string data;
 };
@@ -28,7 +28,7 @@ class SqlServerRepository : public QObject
 	Q_OBJECT
 
 public:
-	SqlServerRepository(QObject *parent);
+	SqlServerRepository();
 	~SqlServerRepository();
 
 	bool connect(std::string host, std::string dbname, 

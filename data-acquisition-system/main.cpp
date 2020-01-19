@@ -5,11 +5,12 @@
 #include "QDir"
 
 #define GOOGLE_GLOG_DLL_DECL
-#define GLOG_NO_ABBREVIATED_SEVERITIES
+//#define GLOG_NO_ABBREVIATED_SEVERITIES
 #include "glog/logging.h"
 
 #include "Config.h"
 #include "SqlServerRepository.h"
+#include "AdvatechCard.h"
 
 #ifdef _DEBUG
 #pragma comment(lib,"../lib/libglog_staticd.lib")
@@ -54,6 +55,11 @@ void initLog()
 	google::SetLogFilenameExtension("log_");
 }
 
+void startCardThread(Device* device)
+{
+
+}
+
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
@@ -62,14 +68,23 @@ int main(int argc, char *argv[])
 	LOG(INFO) << "data acquisition system start.";
 
 	Config config("./config/config.yaml");
-	config.loadConfig();
+    config.loadConfig();
+
 	DatabaseConfig* dc = config.getDatabaseConfig();
 
-	SqlServerRepository ssr(nullptr);
-	if (!ssr.connect(dc->host, dc->dbname, dc->username, dc->password)) {
+	std::shared_ptr<SqlServerRepository> ssr = std::make_shared<SqlServerRepository>();
+
+	if (!ssr->connect(dc->host, dc->dbname, dc->username, dc->password)) {
 		return 0;
 	}
 	LOG(INFO) << "database connect success.";
+
+	DeviceConfig *deviceConfig = config.getDeviceConfig();
+	for (int i=0; i<deviceConfig->devices.size(); i++)
+	{
+        AdvatechCard* advatechCard = new AdvatechCard;
+		advatechCard->init(deviceConfig->devices[i], ssr);
+	}
 
 	MainWindow w;
 	w.show();

@@ -1,15 +1,17 @@
-﻿
-devices:
-  - description: 'DemoDevice,BID#0'                 
+﻿devices:
+  -
+    description: 'DemoDevice,BID#0'                 
     profilePath: '../../profile/DemoDevice.xml'     
     startChannel: 0                                 
     channelCount: 2                                 
     clockRate: 1000                                 
     sectionLength: 1024                             
     groupStartChannel: 0                            
-    groupStopChannel: 0                             
-    thresholds: [0.1, 0.1]                          
-  - description: 'DemoDevice,BID#1'
+    groupStopChannel: 0       
+    maxCount: 100000
+    thresholds: [0.1, 0.1, 0.1]                          
+  - 
+    description: 'DemoDevice,BID#1'
     profilePath: '../../profile/DemoDevice.xml'
     startChannel: 0
     channelCount: 2
@@ -17,11 +19,14 @@ devices:
     sectionLength: 1024
     groupStartChannel: 0
     groupStopChannel: 0
-    thresholds: [0.1, 0.1]
+    maxCount: 100000
+    thresholds: [0.1, 0.1, 0.1]
 serialPort:
-  - portName: com1                                    
+  - 
+    portName: com1                                    
     period: 30s                                       
-  - portName: com2
+  - 
+    portName: com2
     period: 1m
 database:
   host: localhost

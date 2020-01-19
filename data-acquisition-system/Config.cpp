@@ -24,6 +24,7 @@ namespace YAML {
 			device.sectionLength = node["sectionLength"].as<int>();
 			device.groupStartChannel = node["groupStartChannel"].as<int>();
 			device.groupStopChannel = node["groupStopChannel"].as<int>();
+			device.maxCount = node["maxCount"].as<int>();
 
 			for (const auto& n : node["thresholds"])
 			{
@@ -108,20 +109,21 @@ Config::~Config()
 
 bool Config::loadConfig()
 {
-	YAML::Node node = YAML::LoadFile(_configPath);
-	_deviceConfig = new DeviceConfig;
-	*_deviceConfig = node["devices"].as<DeviceConfig>();
-	_serialPortConfig = new SerialPortConfig;
-	*_serialPortConfig = node["serialPort"].as<SerialPortConfig>();
-	_databaseConfig = new DatabaseConfig;
-	*_databaseConfig = node["database"].as<DatabaseConfig>();
+
+    YAML::Node node = YAML::LoadFile(_configPath);
+    _deviceConfig = new DeviceConfig;
+    *_deviceConfig = node["devices"].as<DeviceConfig>();
+    _serialPortConfig = new SerialPortConfig;
+    *_serialPortConfig = node["serialPort"].as<SerialPortConfig>();
+    _databaseConfig = new DatabaseConfig;
+    *_databaseConfig = node["database"].as<DatabaseConfig>();
 
 
-	LOG(INFO) << "load config success. Card count is "
-		<< _deviceConfig->devices.size()
-		<< ". Serial port count is "
-		<< _serialPortConfig->serialPorts.size();
-
+    LOG(INFO) << "load config success. Card count is "
+        << _deviceConfig->devices.size()
+        << ". Serial port count is "
+        << _serialPortConfig->serialPorts.size();
+    
 	return true;
 }
 

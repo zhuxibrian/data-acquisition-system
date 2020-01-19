@@ -1,5 +1,6 @@
 #pragma once
 #include "yaml-cpp/yaml.h"
+#include "yaml-cpp/exceptions.h"
 #include <string>
 #include <vector>
 
@@ -13,6 +14,7 @@ struct Device
 	int sectionLength;
 	int groupStartChannel;
 	int groupStopChannel;
+	int maxCount;
 	std::vector<double> thresholds;
 };
 
