@@ -98,8 +98,9 @@ int main(int argc, char *argv[])
         }
 	}
 
-    if (ret)
+    if (ret != Success && ret >= 0xE0000000)
     {
+        thread.terminate();
         return 0;
     }
 
