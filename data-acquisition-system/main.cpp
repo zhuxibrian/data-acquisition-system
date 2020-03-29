@@ -3,20 +3,23 @@
 
 #include "QDateTime"
 #include "QDir"
+#include <vector>
+#include <QThread>
+#include <QMessageBox>
 
 #define GOOGLE_GLOG_DLL_DECL
 //#define GLOG_NO_ABBREVIATED_SEVERITIES
 #include "glog/logging.h"
-
-#include "Config.h"
-#include "SqlServerRepository.h"
-#include "AdvatechCard.h"
 
 #ifdef _DEBUG
 #pragma comment(lib,"../lib/libglog_staticd.lib")
 #else
 #pragma comment(lib,"../lib/libglog_static.lib")
 #endif // DEBUG
+
+#include "Config.h"
+#include "SqlServerRepository.h"
+#include "AdvatechCard.h"
 
 #define LOGOUTTIME (60*60*24*10)
 void initLog()
@@ -55,10 +58,6 @@ void initLog()
 	google::SetLogFilenameExtension("log_");
 }
 
-void startCardThread(Device* device)
-{
-
-}
 
 int main(int argc, char *argv[])
 {
@@ -73,18 +72,42 @@ int main(int argc, char *argv[])
 	DatabaseConfig* dc = config.getDatabaseConfig();
 
 	std::shared_ptr<SqlServerRepository> ssr = std::make_shared<SqlServerRepository>();
-
 	if (!ssr->connect(dc->host, dc->dbname, dc->username, dc->password)) {
 		return 0;
 	}
 	LOG(INFO) << "database connect success.";
 
+
+    QThread thread;
+    DataAnalyzer analyzer(ssr);
+    analyzer.moveToThread(&thread);
+    thread.start();
+
 	DeviceConfig *deviceConfig = config.getDeviceConfig();
+    std::vector<AdvatechCard*> advathechCards;
+    ErrorCode        ret = Success;
 	for (int i=0; i<deviceConfig->devices.size(); i++)
 	{
-        AdvatechCard* advatechCard = new AdvatechCard;
-		advatechCard->init(deviceConfig->devices[i], ssr);
+        AdvatechCard* card = new AdvatechCard;
+        ret = card->init(deviceConfig->devices[i], &analyzer);
+        advathechCards.push_back(card);
+        if (ret != Success && ret >= 0xE0000000)
+        {
+            QMessageBox::about(NULL, "Error", "advatech card init failed!");
+            break;
+        }
 	}
+
+    if (ret)
+    {
+        return 0;
+    }
+
+
+    for (const auto& c : advathechCards)
+    {
+        c->start();
+    }
 
 	MainWindow w;
 	w.show();

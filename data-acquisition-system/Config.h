@@ -4,8 +4,17 @@
 #include <string>
 #include <vector>
 
+enum TriggerModel
+{
+    UNUSED = 0,
+    RISING,
+    FALLING,
+    UNTRIGGER = 99
+};
+
 struct Device 
 {
+    int deviceID;
 	std::string description;
 	std::string profilePath;
 	int startChannel;
@@ -15,7 +24,9 @@ struct Device
 	int groupStartChannel;
 	int groupStopChannel;
 	int maxCount;
-	std::vector<double> thresholds;
+    std::vector<int> thresholdsTrig;
+	std::vector<double> thresholdsUp;
+    std::vector<double> thresholdsDown;
 };
 
 struct DeviceConfig

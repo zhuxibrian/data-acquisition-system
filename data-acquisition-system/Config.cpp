@@ -16,6 +16,7 @@ namespace YAML {
 	{
 		static bool decode(const Node& node, Device& device)
 		{
+            device.deviceID = node["deviceID"].as<int>();
 			device.description = node["description"].as<std::string>();
 			device.profilePath = node["profilePath"].as<std::string>();
 			device.startChannel = node["startChannel"].as<int>();
@@ -26,10 +27,20 @@ namespace YAML {
 			device.groupStopChannel = node["groupStopChannel"].as<int>();
 			device.maxCount = node["maxCount"].as<int>();
 
-			for (const auto& n : node["thresholds"])
+			for (const auto& n : node["thresholdsTrig"])
 			{
-				device.thresholds.push_back(n.as<double>());
+				device.thresholdsTrig.push_back(n.as<int>());
 			}
+
+            for (const auto& n : node["thresholdsUP"])
+            {
+                device.thresholdsUp.push_back(n.as<double>());
+            }
+
+            for (const auto& n : node["thresholdsDown"])
+            {
+                device.thresholdsDown.push_back(n.as<double>());
+            }
 
 			return true;
 		}

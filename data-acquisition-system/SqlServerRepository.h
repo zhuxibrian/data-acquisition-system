@@ -4,10 +4,9 @@
 #include <QtSql/QSqlDatabase>
 #include <vector>
 
-
-
 struct AnalogInput
 {
+    int deviceID;
 	std::string groupID;
 	int channel;
 	std::string datetime;
@@ -16,7 +15,7 @@ struct AnalogInput
 	std::vector<double> data;
 };
 
-struct SerialPortData
+struct SerialPortInput
 {
 	std::string serialPort;
 	std::string time;
@@ -36,7 +35,7 @@ public:
 
 	bool addAnalogInput(AnalogInput& ai);
 	bool addAnalogInputErr(AnalogInput& ai);
-	bool addSerialPortData(SerialPortData& spd);
+	bool addSerialPortData(SerialPortInput& spd);
 
 
 

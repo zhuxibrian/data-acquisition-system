@@ -17,6 +17,9 @@
     <ClCompile Include="AdvatechCard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DataAnalyzer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resource Files">
@@ -63,6 +66,9 @@
       <Filter>Header Files\repository</Filter>
     </QtMoc>
     <QtMoc Include="AdvatechCard.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="DataAnalyzer.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

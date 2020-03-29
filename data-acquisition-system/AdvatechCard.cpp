@@ -1,12 +1,10 @@
 #include "AdvatechCard.h"
 #include <assert.h>
 #include <thread>
-#include <QUuid>
 
 #include "glog/logging.h"
 
 #include "Utils.h"
-
 
 AdvatechCard::AdvatechCard()
 {
@@ -21,10 +19,10 @@ AdvatechCard::~AdvatechCard()
 	}
 }
 
-Automation::BDaq::ErrorCode AdvatechCard::init(Device& device, std::shared_ptr<SqlServerRepository> ssr)
+Automation::BDaq::ErrorCode AdvatechCard::init(Device& device, DataAnalyzer* dataAnalyzer)
 {
 	ErrorCode        ret = Success;
-	this->lssr = ssr;
+    _analyzer = dataAnalyzer;
 
 	wfAiCtrl = WaveformAiCtrl::Create();
 
@@ -43,8 +41,8 @@ Automation::BDaq::ErrorCode AdvatechCard::init(Device& device, std::shared_ptr<S
 	std::wstring profilePath;
 	Utils::StringToWstring(profilePath, device.profilePath);
 	ret = wfAiCtrl->LoadProfile(profilePath.c_str());//Loads a profile to initialize the device.
-	if (ret != Success)
-		return ret;
+    if (ret != Success && ret >= 0xE0000000)
+        return ret;
 
 	Conversion * conversion = wfAiCtrl->getConversion();
 	ret = conversion->setClockRate(device.clockRate);
@@ -67,12 +65,21 @@ Automation::BDaq::ErrorCode AdvatechCard::init(Device& device, std::shared_ptr<S
 	deviceConfig = device;
 
 	bufferSize = deviceConfig.channelCount * deviceConfig.sectionLength;
-	dataBuffer = new double(bufferSize);
+	dataBuffer = new double[bufferSize];
 
 	totalData = new std::vector<double>(deviceConfig.channelCount * deviceConfig.maxCount);
 
 	startOffset = deviceConfig.groupStartChannel - deviceConfig.startChannel;
+    startTriggModel = deviceConfig.thresholdsTrig[deviceConfig.groupStartChannel];
+    startTriggerValue = startTriggModel == TriggerModel::RISING
+        ? deviceConfig.thresholdsUp[deviceConfig.groupStartChannel]
+        : deviceConfig.thresholdsDown[deviceConfig.groupStartChannel];
+
 	stopOffset = deviceConfig.groupStopChannel - deviceConfig.startChannel;
+    stopTriggModel = deviceConfig.thresholdsTrig[deviceConfig.groupStopChannel];
+    stopTriggerValue = startTriggModel == TriggerModel::RISING
+        ? deviceConfig.thresholdsUp[deviceConfig.groupStopChannel]
+        : deviceConfig.thresholdsDown[deviceConfig.groupStopChannel];
 
 	ret = wfAiCtrl->Prepare();
 	if (ret != Success)
@@ -98,38 +105,38 @@ ErrorCode AdvatechCard::start()
 	return ret;
 }
 
-void handlerThread(QDateTime startTime, Device dc, std::vector<double> data, std::shared_ptr<SqlServerRepository> ssr, RecordState state)
-{
-	int channelCount = dc.channelCount;
-	int rate = dc.clockRate;
-	QUuid id = QUuid::createUuid();
-	std::string strId = id.toString().toStdString();
-
-	for (int i=0; i<channelCount; i++) {
-		AnalogInput ai;
-		ai.channel = i;
-		ai.groupID = strId;
-		ai.frequency = dc.clockRate;
-		for (int j=0; j<data.size()/channelCount; j++) {
-			if (data[j * channelCount + i] >= dc.thresholds[i - dc.startChannel]) {
-				ai.data.push_back(data[j*channelCount + i]);
-			} else if (data[j*channelCount + i] < dc.thresholds[i - dc.startChannel] && ai.data.size() > 0) {
-
-				ai.sampleCount = ai.data.size();
-				ai.datetime = startTime.addMSecs(1000.0 * (j - ai.data.size()) / dc.clockRate).toString("yyyy-M-d H:m:s.zzz").toStdString();
-				state == RS_STOP ? ssr->addAnalogInput(ai) : ssr->addAnalogInputErr(ai);
-				ai.data.clear();
-			}
-		}
-		
-		if (ai.data.size()) {
-			ai.sampleCount = ai.data.size();
-			ai.datetime = startTime.addMSecs(1000.0 * (data.size() / channelCount - ai.data.size()) / dc.clockRate).toString("yyyy-M-d H:m:s.zzz").toStdString();
-			state == RS_STOP ? ssr->addAnalogInput(ai) : ssr->addAnalogInputErr(ai);
-			ai.data.clear();
-		}
-	}
-}
+//void handlerThread(QDateTime startTime, Device dc, std::vector<double> data, std::shared_ptr<SqlServerRepository> ssr, RecordState state)
+//{
+//	int channelCount = dc.channelCount;
+//	int rate = dc.clockRate;
+//	QUuid id = QUuid::createUuid();
+//	std::string strId = id.toString().toStdString();
+//
+//	for (int i=0; i<channelCount; i++) {
+//		AnalogInput ai;
+//		ai.channel = i;
+//		ai.groupID = strId;
+//		ai.frequency = dc.clockRate;
+//		for (int j=0; j<data.size()/channelCount; j++) {
+//			if (data[j * channelCount + i] >= dc.thresholds[i - dc.startChannel]) {
+//				ai.data.push_back(data[j*channelCount + i]);
+//			} else if (data[j*channelCount + i] < dc.thresholds[i - dc.startChannel] && ai.data.size() > 0) {
+//
+//				ai.sampleCount = ai.data.size();
+//				ai.datetime = startTime.addMSecs(1000.0 * (j - ai.data.size()) / dc.clockRate).toString("yyyy-M-d H:m:s.zzz").toStdString();
+//				state == RS_STOP ? ssr->addAnalogInput(ai) : ssr->addAnalogInputErr(ai);
+//				ai.data.clear();
+//			}
+//		}
+//		
+//		if (ai.data.size()) {
+//			ai.sampleCount = ai.data.size();
+//			ai.datetime = startTime.addMSecs(1000.0 * (data.size() / channelCount - ai.data.size()) / dc.clockRate).toString("yyyy-M-d H:m:s.zzz").toStdString();
+//			state == RS_STOP ? ssr->addAnalogInput(ai) : ssr->addAnalogInputErr(ai);
+//			ai.data.clear();
+//		}
+//	}
+//}
 
 void BDAQCALL AdvatechCard::OnDataReadyEvent(void * sender, BfdAiEventArgs * args, void *userParam)
 {
@@ -140,16 +147,30 @@ void BDAQCALL AdvatechCard::OnDataReadyEvent(void * sender, BfdAiEventArgs * arg
 	int32 getDataCount = min(card->bufferSize, args->Count);
 	waveformAiCtrl->GetData(getDataCount, card->dataBuffer, 0, &returnedCount);
 
-
-	for (int32 i = 0; i < getDataCount; i += card->deviceConfig.channelCount) {
-		if (card->state == RS_WAIT && card->dataBuffer[i+card->startOffset] >= card->deviceConfig.thresholds[card->startOffset]) {
+	for (int32 i = 0; i < getDataCount; i += card->deviceConfig.channelCount) 
+    {
+		if (card->state == RS_WAIT
+            && (card->startTriggModel == TriggerModel::RISING 
+                ? card->dataBuffer[i + card->startOffset] >= card->startTriggerValue 
+                : card->dataBuffer[i + card->startOffset] <= card->startTriggerValue)) 
+        {
 			card->state = RS_RECORD;
 			card->startTime = QDateTime::currentDateTime();
 			break;
-		} else if (card->state == RS_RECORD && card->dataBuffer[i + card->stopOffset] < card->deviceConfig.thresholds[card->stopOffset]) {
+		} 
+        else if (card->state == RS_RECORD 
+            && (card->stopTriggModel == TriggerModel::RISING 
+                ? card->dataBuffer[i + card->stopOffset] <= card->stopTriggerValue
+                : card->dataBuffer[i + card->stopOffset] >= card->stopTriggerValue))
+        {
 			card->state = RS_STOP;
 			break;
-		} else if (card->state == RS_ERROR && card->dataBuffer[i + card->stopOffset] < card->deviceConfig.thresholds[card->stopOffset]) {
+		} 
+        else if (card->state == RS_ERROR 
+            && (card->stopTriggModel == TriggerModel::RISING
+                ? card->dataBuffer[i + card->stopOffset] <= card->stopTriggerValue
+                : card->dataBuffer[i + card->stopOffset] >= card->stopTriggerValue))
+        {
 			card->state = RS_WAIT;
 			break;
 		}
@@ -167,7 +188,17 @@ void BDAQCALL AdvatechCard::OnDataReadyEvent(void * sender, BfdAiEventArgs * arg
 	if (card->state == RS_ERROR || card->state == RS_STOP)
 	{
 		card->totalData->insert(card->totalData->end(), card->dataBuffer, card->dataBuffer + getDataCount);
-		std::thread handler(handlerThread, card->startTime, card->deviceConfig, *card->totalData, card->lssr, card->state);
+        if (!card->totalData->empty())
+        {
+            AdvatechCardData* data = new AdvatechCardData;
+            data->device = card->deviceConfig;
+            data->datetime = card->startTime;
+            data->dataSize = card->totalData->size();
+            data->isErrorData = card->state == RS_ERROR ? true : false;
+            data->data = new double[data->dataSize];
+            memcpy(data->data, &card->totalData[0], data->dataSize * sizeof(double));
+            card->_analyzer->pushData(data);
+        }
 		card->totalData->clear();
 	}
 }

@@ -95,6 +95,7 @@
   <ItemGroup>
     <ClCompile Include="AdvatechCard.cpp" />
     <ClCompile Include="Config.cpp" />
+    <ClCompile Include="DataAnalyzer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="SqlServerRepository.cpp" />
@@ -122,6 +123,7 @@
   <ItemGroup>
     <QtMoc Include="AdvatechCard.h" />
     <ClInclude Include="Config.h" />
+    <QtMoc Include="DataAnalyzer.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

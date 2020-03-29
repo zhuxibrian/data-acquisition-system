@@ -8,7 +8,7 @@
 #include "advatech/compatibility.h"
 #include "Config.h"
 
-#include "SqlServerRepository.h"
+#include "DataAnalyzer.h"
 
 using namespace Automation::BDaq;
 
@@ -30,16 +30,14 @@ public:
 	AdvatechCard();
 	~AdvatechCard();
 
-	ErrorCode init(Device& device, std::shared_ptr<SqlServerRepository> ssr);
+	ErrorCode init(Device& device, DataAnalyzer* dataAnalyzer);
 	ErrorCode start();
 	ErrorCode stop();
 	void close();
 
-	//std::vector<std::vector<AnalogInput>> dataVector;
 	Device deviceConfig;
 	std::vector<double>* totalData;
 	QDateTime startTime;
-	std::shared_ptr<SqlServerRepository> lssr;
 
 private:
 	static void BDAQCALL OnDataReadyEvent(void * sender, BfdAiEventArgs * args, void *userParam);
@@ -49,12 +47,20 @@ private:
 
 
 	WaveformAiCtrl* wfAiCtrl = { nullptr };
-	int bufferSize = { 0 };
-	double* dataBuffer = { nullptr };
+
+	int bufferSize = { 0 }; //缓存大小
+	double* dataBuffer = { nullptr }; //缓存区
 
 	int startOffset;
-	int stopOffset;
+    int startTriggModel;
+    int startTriggerValue;
 
-	RecordState state = { RS_WAIT };
+	int stopOffset;
+    int stopTriggModel;
+    int stopTriggerValue;
+
+	RecordState state = { RS_WAIT }; //板卡读数当前状态
+
+    DataAnalyzer* _analyzer;
 
 };

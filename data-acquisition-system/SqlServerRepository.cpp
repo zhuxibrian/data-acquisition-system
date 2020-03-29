@@ -5,7 +5,8 @@
 #include <qdebug.h>
 
 #define SQL_ADD_ANALOG_INPUT ("INSERT INTO [dbo].[Analog_Input]\
-([groupID]\
+([deviceID]\
+    , [groupID]\
 	, [channel]\
 	, [startTime]\
 	, [frequency]\
@@ -13,10 +14,11 @@
 	, [sampleData]\
 	, [isUse])\
 	VALUES\
-	(:groupId, :channel, :startTime, :frequency, :sampleCount, :sampleData, :isUse)")
+	(:deviceId, :groupId, :channel, :startTime, :frequency, :sampleCount, :sampleData, :isUse)")
 
 #define SQL_ADD_ANALOG_INPUT_ERR ("INSERT INTO [dbo].[Analog_Input_Err]\
-([groupID]\
+([deviceID]\
+    , [groupID]\
 	, [channel]\
 	, [startTime]\
 	, [frequency]\
@@ -24,7 +26,7 @@
 	, [sampleData]\
 	, [isUse])\
 	VALUES\
-	(:groupId, :channel, :startTime, :frequency, :sampleCount, :sampleData, :isUse)")
+	(:deviceId, :groupId, :channel, :startTime, :frequency, :sampleCount, :sampleData, :isUse)")
 
 #define SQL_ADD_SERIAL_PORT_DATA ("INSERT INTO [dbo].[Serial_Port_Data]\
 ([serialPort]\
@@ -80,6 +82,7 @@ bool SqlServerRepository::addAnalogInput(AnalogInput& ai)
 
 	bool isUse = 1;
 
+    query.bindValue(":deviceId", ai.deviceID);
 	query.bindValue(":groupId", groupId);
 	query.bindValue(":channel", channel);
 	query.bindValue(":startTime", startTime);
@@ -115,6 +118,7 @@ bool SqlServerRepository::addAnalogInputErr(AnalogInput& ai)
 
 	bool isUse = 1;
 
+    query.bindValue(":deviceId", ai.deviceID);
 	query.bindValue(":groupId", groupId);
 	query.bindValue(":channel", channel);
 	query.bindValue(":startTime", startTime);
@@ -132,7 +136,7 @@ bool SqlServerRepository::addAnalogInputErr(AnalogInput& ai)
 	return true;
 }
 
-bool SqlServerRepository::addSerialPortData(SerialPortData& spd)
+bool SqlServerRepository::addSerialPortData(SerialPortInput& spd)
 {
 	QSqlQuery query;
 	query.prepare(SQL_ADD_SERIAL_PORT_DATA);
