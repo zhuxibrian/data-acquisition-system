@@ -62,6 +62,9 @@ void initLog()
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
+    MainWindow w;
+    w.show();
+
 	initLog();
 
 	LOG(INFO) << "data acquisition system start.";
@@ -80,6 +83,12 @@ int main(int argc, char *argv[])
 
     QThread thread;
     DataAnalyzer analyzer(ssr);
+    QObject::connect(&w, &MainWindow::closeSignal, [&]() {
+        thread.quit();
+        thread.wait();
+    });
+    QObject::connect(&analyzer, &DataAnalyzer::pushDataSignal, &analyzer, &DataAnalyzer::handleData, Qt::QueuedConnection);
+
     analyzer.moveToThread(&thread);
     thread.start();
 
@@ -98,19 +107,13 @@ int main(int argc, char *argv[])
         }
 	}
 
-    if (ret != Success && ret >= 0xE0000000)
+    if (ret == Success)
     {
-        thread.terminate();
-        return 0;
+        for (const auto& c : advathechCards)
+        {
+            c->start();
+        }
     }
 
-
-    for (const auto& c : advathechCards)
-    {
-        c->start();
-    }
-
-	MainWindow w;
-	w.show();
 	return a.exec();
 }

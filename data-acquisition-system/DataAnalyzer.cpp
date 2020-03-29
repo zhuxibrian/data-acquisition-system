@@ -5,7 +5,6 @@
 DataAnalyzer::DataAnalyzer(std::shared_ptr<SqlServerRepository> ssr, QObject* parent /*= nullptr*/)
 {
     this->ssr = ssr;
-    connect(this, SIGNAL(pushDataSignal()), this, SLOT(handleData()), Qt::QueuedConnection);
 }
 
 DataAnalyzer::~DataAnalyzer()

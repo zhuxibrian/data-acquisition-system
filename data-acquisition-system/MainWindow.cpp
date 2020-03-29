@@ -5,3 +5,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
 	ui.setupUi(this);
 }
+
+void MainWindow::closeEvent(QCloseEvent * closeevent)
+{
+    emit closeSignal();
+}
