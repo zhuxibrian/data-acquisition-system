@@ -10,8 +10,6 @@ class MainWindow : public QMainWindow
 public:
 	MainWindow(QWidget *parent = Q_NULLPTR);
 
-    void closeEvent(QCloseEvent * closeevent);
-
 signals:
     void closeSignal();
 

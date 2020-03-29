@@ -62,8 +62,6 @@ void initLog()
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
-    MainWindow w;
-    w.show();
 
 	initLog();
 
@@ -83,10 +81,6 @@ int main(int argc, char *argv[])
 
     QThread thread;
     DataAnalyzer analyzer(ssr);
-    QObject::connect(&w, &MainWindow::closeSignal, [&]() {
-        thread.quit();
-        thread.wait();
-    });
     QObject::connect(&analyzer, &DataAnalyzer::pushDataSignal, &analyzer, &DataAnalyzer::handleData, Qt::QueuedConnection);
 
     analyzer.moveToThread(&thread);
@@ -115,5 +109,12 @@ int main(int argc, char *argv[])
         }
     }
 
-	return a.exec();
+    MainWindow w;
+    w.show();
+
+    int res = a.exec();
+
+    thread.quit();
+    thread.wait();
+    return res;
 }
