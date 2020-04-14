@@ -20,6 +20,9 @@
     <ClCompile Include="DataAnalyzer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TcpServer.cpp">
+      <Filter>Source Files\network</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resource Files">
@@ -57,6 +60,12 @@
     <Filter Include="Header Files\utils">
       <UniqueIdentifier>{ec4a5cac-5286-44eb-ba3e-953d1050fdc6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\network">
+      <UniqueIdentifier>{b7ec18fe-bebf-41c9-af1d-135835b7cd2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\network">
+      <UniqueIdentifier>{d6217073-d1bf-4a5e-890f-b11f89f5038e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="MainWindow.h">
@@ -70,6 +79,9 @@
     </QtMoc>
     <QtMoc Include="DataAnalyzer.h">
       <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="TcpServer.h">
+      <Filter>Header Files\network</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

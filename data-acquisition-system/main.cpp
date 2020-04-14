@@ -20,6 +20,7 @@
 #include "Config.h"
 #include "SqlServerRepository.h"
 #include "AdvatechCard.h"
+#include "TcpServer.h"
 
 #define LOGOUTTIME (60*60*24*10)
 void initLog()
@@ -70,13 +71,59 @@ int main(int argc, char *argv[])
 	Config config("./config/config.yaml");
     config.loadConfig();
 
-	DatabaseConfig* dc = config.getDatabaseConfig();
+    QObject::connect(&TcpServer::getInstance(), &TcpServer::startReadData, [=]() {
+        LOG(INFO) << "startReadData signal recv";
+    });
 
-	std::shared_ptr<SqlServerRepository> ssr = std::make_shared<SqlServerRepository>();
-	if (!ssr->connect(dc->host, dc->dbname, dc->username, dc->password)) {
-		return 0;
-	}
-	LOG(INFO) << "database connect success.";
+    QObject::connect(&TcpServer::getInstance(), &TcpServer::stopReadData, [=]() {
+        LOG(INFO) << "stopReadData signal recv";
+    });
+
+    QObject::connect(&TcpServer::getInstance(), &TcpServer::startSendData, []() {
+        for (int j=0; j<5; j++)
+        {
+            double *data = new double[1000];
+            srand((unsigned)time(NULL));
+            for (int i = 0; i < 1000; i++)
+            {
+                data[i] = (double)(rand() / (double)RAND_MAX);
+            }
+
+            DeviceDataMsg* msg = new DeviceDataMsg();
+            msg->data = new unsigned char[sizeof(double) * 1000];
+            memcpy(msg->data, data, sizeof(double) * 1000);
+            msg->type = MsgType::msg_deviceData;
+            msg->dataSize = sizeof(DeviceDataMsg) + sizeof(double) * 1000 - 4;
+            msg->deviceType = DeviceType::dt_advatechCard;
+            msg->deviceId = 1;
+
+            delete[] data;
+            data = nullptr;
+            TcpServer::getInstance().pushSendMsg(msg);
+
+            Sleep(3000);
+        }
+        LOG(INFO) << "startSendData signal recv";
+    });
+
+    QObject::connect(&TcpServer::getInstance(), &TcpServer::stopSendData, [=]() {
+        LOG(INFO) << "stopSendData signal recv";
+    });
+
+    int res = a.exec();
+
+    return res;
+
+    
+    
+
+    /*DatabaseConfig* dc = config.getDatabaseConfig();
+
+    std::shared_ptr<SqlServerRepository> ssr = std::make_shared<SqlServerRepository>();
+    if (!ssr->connect(dc->host, dc->dbname, dc->username, dc->password)) {
+        return 0;
+    }
+    LOG(INFO) << "database connect success.";
 
 
     QThread thread;
@@ -86,11 +133,13 @@ int main(int argc, char *argv[])
     analyzer.moveToThread(&thread);
     thread.start();
 
-	DeviceConfig *deviceConfig = config.getDeviceConfig();
+    TcpServer tcpServer(nullptr);
+
+    DeviceConfig *deviceConfig = config.getDeviceConfig();
     std::vector<AdvatechCard*> advathechCards;
     ErrorCode        ret = Success;
-	for (int i=0; i<deviceConfig->devices.size(); i++)
-	{
+    for (int i = 0; i < deviceConfig->devices.size(); i++)
+    {
         AdvatechCard* card = new AdvatechCard;
         ret = card->init(deviceConfig->devices[i], &analyzer);
         advathechCards.push_back(card);
@@ -99,7 +148,7 @@ int main(int argc, char *argv[])
             QMessageBox::about(NULL, "Error", "advatech card init failed!");
             break;
         }
-	}
+    }
 
     if (ret == Success)
     {
@@ -116,5 +165,5 @@ int main(int argc, char *argv[])
 
     thread.quit();
     thread.wait();
-    return res;
+    return res;*/
 }
